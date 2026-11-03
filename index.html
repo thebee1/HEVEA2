@@ -7,16 +7,15 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --p600:#124b38; --p500:#1b654b; --p100:#dcebe2; --p400:#70b894;
+    --p600:#124b38; --p500:#1b654b; --p100:#dcebe2;
     --dark900:#103d30; --ink:#173f34; --muted:#65756d;
-    --line:#d9e3dc; --bg:#f2f5f0; --red:#ef4444; --green:#1b7651;
+    --line:#d9e3dc; --red:#ef4444; --green:#1b7651;
   }
   body {
     font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     min-height: 100vh; display: grid; place-items: center;
     background: linear-gradient(135deg, #103d30 0%, #1b654b 100%);
     color: var(--ink); padding: 20px;
-    -webkit-font-smoothing: antialiased;
   }
   .auth-card {
     background: #fff; border-radius: 20px; padding: 40px;
@@ -28,11 +27,9 @@
     width: 64px; height: 64px; border-radius: 16px;
     background: var(--p600); display: grid; place-items: center;
     margin: 0 auto 16px; color: #fff; font-size: 28px; font-weight: 800;
-    letter-spacing: 1px;
   }
   .brand h1 { font-size: 24px; letter-spacing: 2px; color: var(--dark900); }
   .brand p { font-size: 13px; color: var(--muted); margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
-
   .field { margin-bottom: 20px; }
   .field label { display: block; font-size: 13px; font-weight: 600; color: var(--dark900); margin-bottom: 8px; }
   .field input {
@@ -41,17 +38,14 @@
     background: #fff; color: var(--ink);
   }
   .field input:focus { border-color: var(--p500); box-shadow: 0 0 0 3px var(--p100); }
-
   .btn {
     width: 100%; padding: 14px; border-radius: 10px; border: none;
     background: var(--p600); color: #fff; font-size: 15px; font-weight: 700;
-    cursor: pointer; transition: .2s; letter-spacing: .5px;
+    cursor: pointer; transition: .2s;
   }
   .btn:hover { background: var(--p500); transform: translateY(-1px); }
   .btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
   .btn.secondary { background: #fff; color: #b91c1c; border: 1px solid #fecaca; }
-  .btn.secondary:hover { background: #fef2f2; }
-
   .error {
     background: #fee2e2; color: #b91c1c; padding: 12px 14px;
     border-radius: 8px; font-size: 13px; font-weight: 600;
@@ -64,10 +58,8 @@
     margin-bottom: 16px; display: none; border-left: 3px solid #047857;
   }
   .success.show { display: block; }
-
   .footer { text-align: center; margin-top: 28px; font-size: 12px; color: var(--muted); }
   .footer b { color: var(--dark900); }
-
   .spinner {
     display: inline-block; width: 14px; height: 14px;
     border: 2px solid rgba(255,255,255,.3); border-top-color: #fff;
@@ -75,7 +67,6 @@
     vertical-align: middle; margin-right: 8px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-
   .user-badge {
     display: flex; align-items: center; gap: 12px; padding: 12px 16px;
     background: var(--p100); border-radius: 10px; margin-bottom: 20px;
@@ -87,18 +78,13 @@
     font-weight: 700; font-size: 13px; flex: none;
   }
   .user-badge .meta { flex: 1; min-width: 0; }
-  .user-badge .meta div:first-child {
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .user-badge .meta div:last-child {
-    font-size: 12px; color: var(--muted); font-weight: 500; margin-top: 2px;
-  }
+  .user-badge .meta div:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .user-badge .meta div:last-child { font-size: 12px; color: var(--muted); font-weight: 500; margin-top: 2px; }
 </style>
 </head>
 <body>
 
-<div class="auth-card" id="authCard">
-
+<div class="auth-card">
   <!-- ÉCRAN 1 : CONNEXION -->
   <div id="loginScreen">
     <div class="brand">
@@ -106,9 +92,7 @@
       <h1>HEVEA</h1>
       <p>Authentification</p>
     </div>
-
     <div class="error" id="errorBox"></div>
-
     <div class="field">
       <label for="email">Adresse email</label>
       <input type="email" id="email" placeholder="admin@exemple.com" autocomplete="username" spellcheck="false">
@@ -117,16 +101,14 @@
       <label for="password">Mot de passe</label>
       <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
     </div>
-
     <button class="btn" id="loginBtn">Se connecter</button>
-
     <div class="footer">
       <b>HEVEA</b> · Gestion des plantations d'hévéa<br>
       <span style="font-size:11px;">Serveur d'authentification centralisé</span>
     </div>
   </div>
 
-  <!-- ÉCRAN 2 : DÉJÀ CONNECTÉ -->
+  <!-- ÉCRAN 2 : SESSION ACTIVE -->
   <div id="sessionScreen" style="display:none;">
     <div class="brand">
       <div class="brand-logo">H</div>
@@ -144,24 +126,26 @@
     <button class="btn" id="continueBtn" style="margin-bottom:12px;">Continuer vers HEVEA</button>
     <button class="btn secondary" id="logoutBtn">Se déconnecter</button>
   </div>
-
 </div>
 
 <script>
 /* ============================================================
-   1. CONFIGURATION — DOIT ÊTRE IDENTIQUE DANS index.html
+   CONFIGURATION
    ============================================================ */
+// ⚠️ DOIT être identique dans HEVEA1/index.html
 const AUTH_SECRET = 'HEVEA-2024-CLE-PARTAGEE-A-CHANGER-32-CARACTERES-MIN';
-const APP_URL = 'index.html';
+
+// URL de l'application HEVEA (dépôt HEVEA1)
+const APP_URL = 'https://thebee1.github.io/HEVEA1/';
+
+// Durée de validité du token
 const TOKEN_TTL_MS = 8 * 60 * 60 * 1000; // 8 heures
 
+// Clé de session locale (côté auth.html)
+const AUTH_SESSION_KEY = 'hevea_auth_session';
+
 /* ============================================================
-   2. BASE D'UTILISATEURS
-   ⚠️ Les passwordHash ci-dessous sont des PLACEHOLDERS.
-   La vraie vérification est faite avec le mot de passe en clair
-   côté client via sha256Hex() — voir doLogin() plus bas.
-   Le champ passwordHash sera écrasé au premier chargement
-   par le calcul SHA-256 automatique.
+   BASE D'UTILISATEURS
    ============================================================ */
 const USERS = [
   {
@@ -179,13 +163,8 @@ const USERS = [
 ];
 
 /* ============================================================
-   3. OUTILS CRYPTO
+   OUTILS CRYPTO
    ============================================================ */
-async function sha256Hex(text) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-  return [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('');
-}
-
 function b64uEncode(str) {
   return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
@@ -194,7 +173,6 @@ function b64uDecode(str) {
   while (str.length % 4) str += '=';
   return atob(str);
 }
-
 async function hmacSign(payloadStr) {
   const key = await crypto.subtle.importKey(
     'raw',
@@ -206,7 +184,6 @@ async function hmacSign(payloadStr) {
   const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(payloadStr));
   return [...new Uint8Array(sig)].map(x => x.toString(16).padStart(2, '0')).join('');
 }
-
 async function createToken(user) {
   const payload = {
     email: user.email,
@@ -220,19 +197,34 @@ async function createToken(user) {
   const signature = await hmacSign(payloadB64);
   return `${payloadB64}.${signature}`;
 }
+async function verifyToken(token) {
+  if (!token) return null;
+  const parts = token.split('.');
+  if (parts.length !== 2) return null;
+  const [payloadB64, signature] = parts;
+  const expected = await hmacSign(payloadB64);
+  if (expected !== signature) return null;
+  try {
+    const payload = JSON.parse(b64uDecode(payloadB64));
+    if (payload.exp < Date.now()) return null;
+    return payload;
+  } catch { return null; }
+}
 
 /* ============================================================
-   4. UI
+   UI
    ============================================================ */
 const $ = id => document.getElementById(id);
 const errorBox = $('errorBox');
-
 function showError(msg) {
   errorBox.textContent = msg;
   errorBox.classList.add('show');
   setTimeout(() => errorBox.classList.remove('show'), 5000);
 }
 
+/* ============================================================
+   CONNEXION
+   ============================================================ */
 async function doLogin() {
   const email = $('email').value.trim().toLowerCase();
   const password = $('password').value;
@@ -245,8 +237,7 @@ async function doLogin() {
   const btn = $('loginBtn');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Vérification…';
-
-  await new Promise(r => setTimeout(r, 500));
+  await new Promise(r => setTimeout(r, 400));
 
   try {
     const user = USERS.find(u => u.email === email);
@@ -261,17 +252,18 @@ async function doLogin() {
 
     const token = await createToken(user);
 
-    localStorage.setItem('hevea_token', token);
-    localStorage.setItem('hevea_user', JSON.stringify({
+    // Sauvegarde locale côté auth.html (HEVEA2)
+    localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify({
+      token,
       email: user.email,
       role: user.role,
-      name: user.displayName
+      name: user.displayName,
+      at: new Date().toISOString()
     }));
-    localStorage.setItem('hevea_login_at', new Date().toISOString());
 
-    const params = new URLSearchParams(location.search);
-    const redirect = params.get('redirect') || APP_URL;
-    location.href = redirect;
+    // Redirection vers HEVEA1 avec le token dans le #hash
+    const redirect = APP_URL;
+    location.href = `${redirect}#token=${encodeURIComponent(token)}`;
 
   } catch (e) {
     console.error(e);
@@ -282,52 +274,46 @@ async function doLogin() {
 }
 
 /* ============================================================
-   5. DÉTECTION DE SESSION EXISTANTE
+   VÉRIFICATION DE SESSION LOCALE (côté auth.html)
    ============================================================ */
 async function checkExistingSession() {
-  const token = localStorage.getItem('hevea_token');
-  if (!token) return false;
+  const raw = localStorage.getItem(AUTH_SESSION_KEY);
+  if (!raw) return false;
 
-  const parts = token.split('.');
-  if (parts.length !== 2) { localStorage.removeItem('hevea_token'); return false; }
+  let stored;
+  try { stored = JSON.parse(raw); } catch { return false; }
 
-  const [payloadB64, signature] = parts;
-  const expected = await hmacSign(payloadB64);
-  if (expected !== signature) { localStorage.removeItem('hevea_token'); return false; }
-
-  try {
-    const payload = JSON.parse(b64uDecode(payloadB64));
-    if (payload.exp < Date.now()) { localStorage.removeItem('hevea_token'); return false; }
-
-    $('loginScreen').style.display = 'none';
-    $('sessionScreen').style.display = 'block';
-    $('userEmail').textContent = payload.email;
-    $('userRole').textContent = payload.role === 'admin' ? 'Administrateur' : 'Utilisateur';
-    $('userInitials').textContent = (payload.name || payload.email)
-      .split(/\s+/).map(s => s[0]).slice(0, 2).join('').toUpperCase();
-    return true;
-  } catch {
-    localStorage.removeItem('hevea_token');
+  const payload = await verifyToken(stored.token);
+  if (!payload) {
+    localStorage.removeItem(AUTH_SESSION_KEY);
     return false;
   }
+
+  $('loginScreen').style.display = 'none';
+  $('sessionScreen').style.display = 'block';
+  $('userEmail').textContent = payload.email;
+  $('userRole').textContent = payload.role === 'admin' ? 'Administrateur' : 'Utilisateur';
+  $('userInitials').textContent = (payload.name || payload.email)
+    .split(/\s+/).map(s => s[0]).slice(0, 2).join('').toUpperCase();
+  return true;
 }
 
 /* ============================================================
-   6. ÉVÉNEMENTS
+   ÉVÉNEMENTS
    ============================================================ */
 $('loginBtn').addEventListener('click', doLogin);
 $('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 $('email').addEventListener('keydown', e => { if (e.key === 'Enter') $('password').focus(); });
 
-$('continueBtn').addEventListener('click', () => {
-  const params = new URLSearchParams(location.search);
-  location.href = params.get('redirect') || APP_URL;
+$('continueBtn').addEventListener('click', async () => {
+  const raw = localStorage.getItem(AUTH_SESSION_KEY);
+  if (!raw) { location.reload(); return; }
+  const stored = JSON.parse(raw);
+  location.href = `${APP_URL}#token=${encodeURIComponent(stored.token)}`;
 });
 
 $('logoutBtn').addEventListener('click', () => {
-  localStorage.removeItem('hevea_token');
-  localStorage.removeItem('hevea_user');
-  localStorage.removeItem('hevea_login_at');
+  localStorage.removeItem(AUTH_SESSION_KEY);
   $('sessionScreen').style.display = 'none';
   $('loginScreen').style.display = 'block';
   $('email').value = '';
@@ -335,12 +321,11 @@ $('logoutBtn').addEventListener('click', () => {
 });
 
 /* ============================================================
-   7. INITIALISATION
+   INITIALISATION
    ============================================================ */
 (async function init() {
   await checkExistingSession();
 })();
 </script>
-
 </body>
 </html>
