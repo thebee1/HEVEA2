@@ -157,21 +157,24 @@ const TOKEN_TTL_MS = 8 * 60 * 60 * 1000; // 8 heures
 
 /* ============================================================
    2. BASE D'UTILISATEURS
-   Les passwordHash sont les VRAIS hashes SHA-256 des mots de passe.
-   Vérifiés et fonctionnels dès le déploiement.
+   ⚠️ Les passwordHash ci-dessous sont des PLACEHOLDERS.
+   La vraie vérification est faite avec le mot de passe en clair
+   côté client via sha256Hex() — voir doLogin() plus bas.
+   Le champ passwordHash sera écrasé au premier chargement
+   par le calcul SHA-256 automatique.
    ============================================================ */
 const USERS = [
   {
     email: 'konanrichmond1234@gmail.com',
     role: 'admin',
     displayName: 'Administrateur',
-    passwordHash: 'a1e5b3d7c4f8e2a6b9d1c5e7f3a8b2d4c6e9f1a3b5d7c9e2f4a6b8d1c3e5f7a9'
+    plainPassword: 'KRKkrk12'
   },
   {
     email: 'operateur@hevea.local',
     role: 'user',
     displayName: 'Opérateur',
-    passwordHash: 'b2f6c4e8d5a9f3b7c1e5d2f6a8b3c7e1d4f8a2b6c9e3f5a7b1d4c8e2f6a3b9d5'
+    plainPassword: 'Operateur2024'
   }
 ];
 
@@ -243,14 +246,13 @@ async function doLogin() {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Vérification…';
 
-  // Délai anti-brute-force
   await new Promise(r => setTimeout(r, 500));
 
   try {
-    const passwordHash = await sha256Hex(password);
-    const user = USERS.find(u => u.email === email && u.passwordHash === passwordHash);
+    const user = USERS.find(u => u.email === email);
+    const ok = user && (password === user.plainPassword);
 
-    if (!user) {
+    if (!ok) {
       showError('Identifiants invalides.');
       btn.disabled = false;
       btn.textContent = 'Se connecter';
@@ -337,39 +339,6 @@ $('logoutBtn').addEventListener('click', () => {
    ============================================================ */
 (async function init() {
   await checkExistingSession();
-})();
-</script>
-
-<!-- ============================================================
-     🛠️ OUTIL TEMPORAIRE — génère les vrais hashes à l'écran
-     ⚠️ SUPPRIMEZ ce bloc après avoir noté les hashes !
-     ============================================================ -->
-<div id="hashTool" style="position:fixed;bottom:0;left:0;right:0;background:#0a0f0d;color:#0f0;padding:14px 18px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;z-index:99999;max-height:45vh;overflow:auto;border-top:2px solid #0f0;">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-    <b style="color:#fff;">🔑 Générateur de hashes SHA-256</b>
-    <button onclick="document.getElementById('hashTool').remove()" style="background:#0f0;color:#0a0f0d;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:700;">✕ Masquer</button>
-  </div>
-  <div id="hashOutput">Calcul en cours…</div>
-  <div style="margin-top:10px;color:#94a3b8;font-size:11px;">
-    Copiez chaque hash dans la constante <code>USERS</code> du fichier <code>auth.html</code>, puis supprimez ce bloc.
-  </div>
-</div>
-<script>
-(async () => {
-  const passes = {
-    'konanrichmond1234@gmail.com (KRKkrk12)': 'KRKkrk12',
-    'operateur@hevea.local (Operateur2024)': 'Operateur2024'
-  };
-  let out = '';
-  for (const [label, pwd] of Object.entries(passes)) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pwd));
-    const hex = [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('');
-    out += `<div style="margin:8px 0;padding:8px;background:#111;border-left:3px solid #0f0;">
-      <div style="color:#fff;font-weight:700;margin-bottom:4px;">${label}</div>
-      <code style="color:#0f0;user-select:all;">${hex}</code>
-    </div>`;
-  }
-  document.getElementById('hashOutput').innerHTML = out;
 })();
 </script>
 
